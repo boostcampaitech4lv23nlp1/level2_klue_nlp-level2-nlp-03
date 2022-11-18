@@ -8,6 +8,7 @@ from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
 from data_loader.custom_dataloader import Customdataset
 from models.encoder_model import EncoderModel
+import metrics.metrics as Metrics
 from utils.optimizers import fetch_scheduler
 from utils.loss import CELoss
 from trainer import train as trainer
@@ -52,6 +53,9 @@ wandb.init(project='test-project',
         name=experiment_name,
         entity="nlp6")
 
+## metrics 이름을 metric_list에 넣어놓고 metrics 딕셔너리에 이름과 함수를 초기화
+metric_list = ['klue_re_micro_f1', 'klue_re_auprc']
+metrics = {metric_list : getattr(Metrics, metric) for metric in metric_list}
 
 loss_fn = torch.nn.CrossEntropyLoss()
 # loss_fn = CELoss
@@ -65,6 +69,7 @@ print("="*100)
 
 trainer(model, 
     loss_fn,
+    metrics,
     optimizer, 
     scheduler,
     train_dataloader, 

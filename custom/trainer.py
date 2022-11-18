@@ -3,11 +3,10 @@ import torch
 import numpy as np
 import wandb
 import torch.nn.functional as F
-from sklearn.metrics import f1_score
 from tqdm.auto import tqdm
 
 
-def train(model, loss_fn, optimizer, scheduler, train_dataloader, valid_dataloader, EPOCHS, device):
+def train(model, loss_fn, metrics, optimizer, scheduler, train_dataloader, valid_dataloader, EPOCHS, device):
     min_val_loss = 1
     for epoch in range(EPOCHS):
         gc.collect()
@@ -44,7 +43,7 @@ def train(model, loss_fn, optimizer, scheduler, train_dataloader, valid_dataload
         pbar.close()
         val_loss = 0
         val_steps = 0
-        total_val_score=0
+        total_val_score={metric_name : 0 for metric_name in metrics}
         
         with torch.no_grad():
             model.eval()
@@ -64,24 +63,36 @@ def train(model, loss_fn, optimizer, scheduler, train_dataloader, valid_dataload
                 
                 preds = np.argmax(prob, axis=-1)
                 label = label.squeeze().detach().cpu().numpy()
-                total_val_score += f1_score(label, preds, average='micro').item()
+                
+                for name, metric_fn in metrics.itmes():
+                    total_val_score[name] += metric_fn(label, preds).item()
             
+            ## validation loss
             val_loss /= val_steps
-            total_val_score /= val_steps
-            print(f"Epoch [{epoch+1}/{EPOCHS}] Score : {total_val_score}")
             print(f"Epoch [{epoch+1}/{EPOCHS}] Val_loss : {val_loss}")
+            wandb.log({
+                'epoch' : epoch
+                ,'val_loss':val_loss})
+            
+            ## validation score
+            for i, name, val_score in enumerate(total_val_score.items()):
+                print(f"Epoch [{epoch+1}/{EPOCHS}] {name} : {val_score/val_steps}")
+                
+                if i != len(total_val_score)-1:
+                    wandb.log({
+                        'epoch' : epoch 
+                        ,name:val_score/val_steps}, commit=False)
+                else:
+                    wandb.log({
+                        'epoch' : epoch 
+                        ,name:val_score/val_steps})
+                
 
             if min_val_loss > val_loss:
                 print('save checkpoint!')
                 torch.save(model.state_dict(), 'model.pt')
                 min_val_loss = val_loss
 
-            wandb.log({
-                'epoch' : epoch
-                ,'val_loss':val_loss})
-            wandb.log({
-                'epoch' : epoch 
-                ,'val_acc':total_val_score})
 
     del train_dataloader, valid_dataloader
     gc.collect()
