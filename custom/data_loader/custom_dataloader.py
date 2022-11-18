@@ -3,9 +3,9 @@ import pandas as pd
 from torch.utils.data import Dataset
 
 class Customdataset(Dataset):
-    def __init__(self, data, tokenizer,mode:bool):
-        self.df_data = self.load_data(data)
+    def __init__(self, data, tokenizer, mode:bool):
         self.mode = mode
+        self.df_data = self.load_data(data)
         self.tokenizer = tokenizer
 
     def __getitem__(self, idx):
@@ -56,18 +56,24 @@ class Customdataset(Dataset):
             'per:schools_attended', 'per:date_of_death', 'per:date_of_birth',
             'per:place_of_birth', 'per:place_of_death', 'org:founded_by',
             'per:religion']
-        for i in range(len(label_list)):
-            label_to_num[label_list[i]] = i
 
-        for i,j,k in zip(dataset['subject_entity'], dataset['object_entity'],dataset['label']):
+        for i in range(len(label_list)):
+                label_to_num[label_list[i]] = i
+
+        for i,j in zip(dataset['subject_entity'], dataset['object_entity']):
             i = i[1:-1].split(',')[0].split(':')[1]
-            j = j[1:-1].split(',')[0].split(':')[1]
-            tmp = label_to_num[k]
+            j = j[1:-1].split(',')[0].split(':')[1] 
 
             subject_entity.append(i)
             object_entity.append(j)
-            num_label.append(tmp)
-        out_dataset = pd.DataFrame({'id':dataset['id'], 'sentence':dataset['sentence'],'subject_entity':subject_entity,'object_entity':object_entity,'label':num_label,})
+        out_dataset = pd.DataFrame({'sentence':dataset['sentence'],'subject_entity':subject_entity,'object_entity':object_entity})
+
+        if self.mode:
+            for i in dataset['label']:
+                tmp = label_to_num[i]
+                num_label.append(tmp)
+            out_dataset['label'] = num_label
+    
         self.num_to_label = label_list
         del subject_entity, object_entity, dataset, num_label, label_to_num
         return out_dataset

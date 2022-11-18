@@ -3,6 +3,7 @@ import pandas as pd
 import wandb
 import numpy as np
 import torch
+from tqdm.auto import tqdm
 import torch.nn.functional as F
 from transformers import AutoTokenizer
 from torch.utils.data import DataLoader
@@ -18,8 +19,8 @@ device='cuda'
 MAX_LEN = 160
 
 def get_test_dataloader(tokenizer, test_data, BATCH_SIZE):
-    test_dataset = Customdataset(test_data, tokenizer,True)
-    num_to_label = test_data.num_to_label
+    test_dataset = Customdataset(test_data, tokenizer,False)
+    num_to_label = test_dataset.num_to_label
     
     test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, pin_memory=True, shuffle=False)
     
@@ -36,16 +37,16 @@ def inference(model, test_dataloader):
     all_preds = []
     all_probs = []
     with torch.no_grad():
-        for batch in test_dataloader:
+        for batch in tqdm(test_dataloader):
             input_ids = batch["input_ids"].to(device)
             attention_mask = batch["attention_mask"].to(device)
             logits = model(input_ids, attention_mask)
 
             probs = F.softmax(logits, dim=-1)
-            preds = np.argmax(probs, axis=-1)
+            preds = np.argmax(probs.detach().cpu().numpy(), axis=-1)
 
             all_preds.append(preds)
-            all_probs.append(probs)
+            all_probs.append(probs.detach().cpu().numpy())
     return np.concatenate(all_preds).tolist(), np.concatenate(all_probs, axis=0).tolist()
 
 # load data
@@ -70,3 +71,4 @@ predictions = func_num_to_label(predictions, num_to_label)
 
 output = df_data.assign(pred_label = predictions, probs = probablity)
 output.to_csv('./prediction/submission.csv', index=False)
+print("DONE!!")
