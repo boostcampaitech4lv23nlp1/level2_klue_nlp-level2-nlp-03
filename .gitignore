@@ -1,8 +1,10 @@
 *.pt
 *.textClipping
+*/*.csv
 
 __pycache__
+.vscode
 
-train/
-test/
+save/*
+data/
 wandb/

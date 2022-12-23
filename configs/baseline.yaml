@@ -1,0 +1,26 @@
+data:
+    n_splits: 5
+    train_path: data/train.csv
+    test_path: data/test_data.csv
+    
+model:
+    model_name : klue/bert-base
+    data_class : BaselineDataset
+    model_class : BaselineModel
+    trainer: BaselineTrainer
+    saved_dir: Baseline
+    loss : CEloss
+    metric_list:
+        metric1 : klue_re_micro_f1
+        metric2 : klue_re_auprc
+    optimizer : AdamW
+    dropout_rate : 0.1
+
+train:
+    seed: 42
+    gpus: 1
+    batch_size: 16
+    max_epoch: 10
+    learning_rate: 5e-5
+    logging_step: 1
+    max_length : 270

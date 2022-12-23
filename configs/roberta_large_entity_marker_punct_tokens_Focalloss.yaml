@@ -1,0 +1,27 @@
+data:
+    n_splits: 5
+    train_path: data/train.csv
+    test_path: data/test_data.csv
+    entity_marker_mode: entity_marker_punct
+    
+model:
+    model_name : klue/roberta-large
+    data_class : EntityTokensDataset
+    model_class : EntityTokensModel
+    trainer: EntityTokensTrainer
+    saved_dir: roberta_large_entity_marker_punct
+    loss : Focalloss
+    metric_list:
+        metric1 : klue_re_micro_f1
+        metric2 : klue_re_auprc
+    optimizer : AdamW
+    dropout_rate : 0.1
+
+train:
+    seed: 42
+    gpus: 1
+    batch_size: 32
+    max_epoch: 5
+    learning_rate: 5e-5
+    logging_step: 1
+    max_length : 270

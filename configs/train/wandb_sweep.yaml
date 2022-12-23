@@ -1,0 +1,44 @@
+# entity: 팀원들과 함께 있는 그룹 이름
+# project: 그룹 내에 존재하는 원하는 프로젝트 이름
+entity: nlp6 
+project: test-project
+count: 2
+
+sweep:
+    method: random
+    metric:
+        name: val_klue_re_micro_f1 # grid, random
+        goal: maximize
+    parameters:
+        # https://community.wandb.ai/t/multi-level-nesting-in-yaml-for-sweeps/3108
+        data.n_splits:
+            values:
+                - 5
+                - 10
+                - 20
+        train.learning_rate:
+            values:
+                - 1e-6
+                - 5e-6
+                - 1e-5
+                - 5e-5
+        train.batch_size:
+            values:
+                # - 16
+                - 32
+                # - 64
+        train.dropout_rate:
+            values:
+                - 0.1
+                - 0.2
+        train.optimizer:
+            values:
+                - AdamW
+                # - AdamP
+        # train.lr_scheduler:
+        #         - cos
+        #         - exp
+        train.loss:
+            values:
+                - CEloss
+                

@@ -1,0 +1,28 @@
+data:
+    n_splits: 5
+    train_path: data/train.csv
+    test_path: data/test_data.csv
+    entity_marker_mode: entity_marker
+    entity_marker_num: 4
+    
+model:
+    model_name : klue/roberta-large
+    data_class : QueryDataset
+    model_class : PLMRNNModel
+    trainer: BaselineTrainer
+    saved_dir: query_entity_marker
+    loss : CEloss
+    metric_list:
+        metric1 : klue_re_micro_f1
+        metric2 : klue_re_auprc
+    optimizer : AdamW
+    dropout_rate : 0.2
+
+train:
+    seed: 42
+    gpus: 1
+    batch_size: 16
+    max_epoch: 5
+    learning_rate: 1e-5
+    logging_step: 1
+    max_length : 270

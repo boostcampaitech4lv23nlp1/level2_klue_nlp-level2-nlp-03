@@ -1,0 +1,8 @@
+# entity: 팀원들과 함께 있는 그룹 이름
+# project: 그룹 내에 존재하는 원하는 프로젝트 이름
+# group: 프로젝트 내에 하부 그룹 이름
+# experiment: 내 실험 이름
+entity: nlp6 
+project: test-project
+group: test-group
+experiment: test-experiment

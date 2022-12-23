@@ -1,0 +1,26 @@
+data:
+    n_splits: 5
+    train_path: data/train.csv
+    test_path: data/test_data.csv
+    
+model:
+    model_name : KETI-AIR/ke-t5-base
+    data_class : T5Dataset
+    model_class : BaselineModel
+    trainer: EntityTokensTrainer
+    saved_dir: T5_Tokens
+    loss : CEloss
+    metric_list:
+        metric1 : klue_re_micro_f1
+        metric2 : klue_re_auprc
+    optimizer : AdamW
+    dropout_rate : 0.2
+
+train:
+    seed: 42
+    gpus: 1
+    batch_size: 32
+    max_epoch: 5
+    learning_rate: 1e-5
+    logging_step: 1
+    max_length : 300
