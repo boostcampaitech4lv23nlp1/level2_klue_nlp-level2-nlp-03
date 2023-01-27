@@ -1,7 +1,7 @@
 # level2_klue_nlp-level2-nlp-03
 
 ## Wrap up Report
-Please Click [here](https://www.notion.so/NLP-Wrap-up-Report-49002b7186304491a7954e0d4e7ae309) for more details!
+Please Click [here](https://www.notion.so/WrapUp-Report-NLP-3-5b5e7ae215224c79897f30b679607f43) for more details!
 
 ## [NLP] Competition Summary
 
